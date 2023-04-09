@@ -18,83 +18,91 @@ propertyController.get('/getAll/:id', verifyToken, async(req,res) => {
     }
 })
 // get all
-propertyController.get('/getAll', async(req,res) => {
-    try {
-        const properties = await Property.find({})
+propertyController.get("/getAll", async (req, res) => {
+  try {
+    const properties = await Property.find({});
 
-        console.log(properties)
-        
-        return res.status(200).json(properties)
-    } catch (error) {
-        console.error(error)
-    }
-})
+    console.log(properties);
+
+    return res.status(200).json(properties);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 // get featured
-propertyController.get('/find/featured', async (req, res) => {
-    try {
-        const featuredProperties = await Property.find({ featured: true }).populate("currentOwner", '-password')
-        return res.status(200).json(featuredProperties)
-    } catch (error) {
-        return res.status(500).json(error)
-    }
-})
+propertyController.get("/find/featured", async (req, res) => {
+  try {
+    const featuredProperties = await Property.find({ featured: true }).populate(
+      "currentOwner",
+      "-password"
+    );
+    return res.status(200).json(featuredProperties);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
 
 // get all from type
-propertyController.get('/find', async (req, res) => {
-    const type = req.query
-    let properties = []
-    try {
-        if (type) {
-            properties = await Property.find(type).populate("owner", '-password')
-        } else {
-            properties = await Property.find({})
-        }
-
-        return res.status(200).json(properties)
-    } catch (error) {
-        return res.status(500).json(error)
+propertyController.get("/find", async (req, res) => {
+  const type = req.query;
+  let properties = [];
+  try {
+    if (type) {
+      properties = await Property.find(type).populate("owner", "-password");
+    } else {
+      properties = await Property.find({});
     }
-})
+
+    return res.status(200).json(properties);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
 
 // TODO FETCH TYPE OF PROPERTIES. EX: {BEACH: 34, MOUNTAIN: 23}
-propertyController.get('/find/types', async(req, res) => {
-    try {
-       const beachType = await Property.countDocuments({type: 'beach'})
-       const mountainType = await Property.countDocuments({type: 'mountain'})
-       const villageType =  await Property.countDocuments({type: 'village'}) 
+propertyController.get("/find/types", async (req, res) => {
+  try {
+    const beachType = await Property.countDocuments({ type: "beach" });
+    const mountainType = await Property.countDocuments({ type: "mountain" });
+    const villageType = await Property.countDocuments({ type: "village" });
 
-       return res.status(200).json({beach: beachType, mountain: mountainType, village: villageType})
-    } catch (error) {
-        return res.status(500).json(error) 
-    }
-})
+    return res
+      .status(200)
+      .json({ beach: beachType, mountain: mountainType, village: villageType });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
 
 // TODO FETCH INDIVIDUAL PROPERTY currentOwner
 propertyController.get('/find/:id', async(req, res) => {
     try {
         const property = await Property.findById(req.params.id).populate('currentOwner', '-password')
 
-        if(!property){
-            throw new Error('No such property with that id')
-        } else {
-            return res.status(200).json(property)
-        }
-    } catch (error) {
-        return res.status(500).json(error) 
+    if (!property) {
+      throw new Error("No such property with that id");
+    } else {
+      return res.status(200).json(property);
     }
-})
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
 
 // create estate
-propertyController.post('/', verifyToken, async (req, res) => {
-    try {
-        const newProperty = await Property.create({ ...req.body, currentOwner: req.user.id })
+propertyController.post("/", verifyToken, async (req, res) => {
+  try {
+    const newProperty = await Property.create({
+      ...req.body,
+      currentOwner: req.user.id,
+    });
 
-        return res.status(201).json(newProperty)
-    } catch (error) {
-        return res.status(500).json(error)
-    }
-})
+    return res.status(201).json(newProperty);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
 
 // update estate
 propertyController.put('/update/:id', verifyToken, async (req, res) => {
@@ -114,7 +122,7 @@ propertyController.put('/update/:id', verifyToken, async (req, res) => {
     } catch (error) {
         return res.status(500).json(error)
     }
-})
+});
 
 // delete estate
 propertyController.get('/delete/:id', verifyToken, async (req, res) => {
@@ -130,6 +138,6 @@ propertyController.get('/delete/:id', verifyToken, async (req, res) => {
     } catch (error) {
         return res.status(500).json(error)
     }
-})
+});
 
-module.exports = propertyController
+module.exports = propertyController;
