@@ -2,7 +2,21 @@ const verifyToken = require('../middlewares/verifyToken')
 const Property = require('../models/Property')
 const User = require('../models/User')
 const propertyController = require('express').Router()
+const  ObjectID = require('mongodb').ObjectId;
 
+
+propertyController.get('/getAll/:id', verifyToken, async(req,res) => {
+
+    try {
+        const properties = await Property.find({'currentOwner' : ObjectID(req.params.id)})
+
+        console.log(properties)
+        
+        return res.status(200).json(properties)
+    } catch (error) {
+        console.error(error)
+    }
+})
 // get all
 propertyController.get('/getAll', async(req,res) => {
     try {
@@ -56,7 +70,7 @@ propertyController.get('/find/types', async(req, res) => {
     }
 })
 
-// TODO FETCH INDIVIDUAL PROPERTY
+// TODO FETCH INDIVIDUAL PROPERTY currentOwner
 propertyController.get('/find/:id', async(req, res) => {
     try {
         const property = await Property.findById(req.params.id).populate('currentOwner', '-password')
@@ -83,12 +97,12 @@ propertyController.post('/', verifyToken, async (req, res) => {
 })
 
 // update estate
-propertyController.put('/:id', verifyToken, async (req, res) => {
+propertyController.put('/update/:id', verifyToken, async (req, res) => {
     try {
         const property = await Property.findById(req.params.id)
-        if (property.owner !== req.user.id) {
-            throw new Error("You are not allowed to update other people properties")
-        }
+        // if (property.owner !== req.user.id) {
+        //     throw new Error("You are not allowed to update other people properties")
+        // }
 
         const updatedProperty = await Property.findByIdAndUpdate(
             req.params.id,
@@ -103,15 +117,15 @@ propertyController.put('/:id', verifyToken, async (req, res) => {
 })
 
 // delete estate
-propertyController.put('/:id', verifyToken, async (req, res) => {
+propertyController.get('/delete/:id', verifyToken, async (req, res) => {
     try {
         const property = await Property.findById(req.params.id)
-        if (property.owner !== req.user.id) {
-            throw new Error("You are not allowed to delete other people properties")
-        }
-
-        await property.delete()
-
+        console.log(`deletedkhgkhj`)
+        // if (property. !== req.user.id) {
+        //     throw new Error("You are not allowed to delete other people properties")
+        // }
+        const data =  await property.deleteOne()
+        console.log('deleting')
         return res.status(200).json({msg: "Successfully deleted property"})
     } catch (error) {
         return res.status(500).json(error)
